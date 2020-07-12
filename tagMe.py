@@ -7,8 +7,8 @@ from tqdm import tqdm
 from multiprocessing import Pool as ProcessPool
 time0 = time.time()
 
-dataset = 'example'
-
+# dataset = 'example'
+dataset = 'agnews'
 
 def getEntityList(text):
     url = 'https://tagme.d4science.org/tagme/tag'
