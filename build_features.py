@@ -33,7 +33,9 @@ def build_entity_feature_with_description(datapath, stopwords=list()):
     cnt = 0
     for i in tqdm(range(40), desc="Read desc: "):
         filename = str(i).zfill(4)
-        with open("./data/wikiAbstract/"+filename, 'r') as f:
+        path_name_gdrive = "/content/drive/My Drive/Thesis HGAT/Code/test code/HGAT_author/wikiAbstract/"
+#         with open("./data/wikiAbstract/"+filename, 'r') as f:
+        with open(path_name_gdrive+filename, 'r') as f:    
             for line in f:
                 ent, desc = line.strip('\n').split('\t')
                 entity = ent.replace(" ", "_")
