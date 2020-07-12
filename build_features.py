@@ -12,7 +12,7 @@ import os
 from utils import sample, preprocess_corpus_notDropEntity, load_stopwords
 
 import jieba
-DATASETS = 'example'
+DATASETS = 'agnews'
 
 
 
