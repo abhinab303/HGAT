@@ -12,7 +12,7 @@ from scipy import sparse as spr
 
 from utils import sample
 
-DATASETS = 'example'
+DATASETS = 'agnews'
 
 
 
