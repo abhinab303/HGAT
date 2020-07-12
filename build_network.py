@@ -9,7 +9,8 @@ from tqdm import tqdm
 
 from utils import sample
 
-DATASETS = 'example'
+DATASETS = 'agnews'
+
 
 NumOfTrainTextPerClass = 2
 TOPK = 10
@@ -57,7 +58,9 @@ with open(datapath+'{}.txt'.format(DATASETS), 'r', encoding='utf8') as f:
 
 # load similarities between entities
 print("loading Gensim.word2vec. ")
-model = gensim.models.Word2Vec.load(rootpath+'data/word2vec/word2vec_gensim_5')
+w2v_path = "/content/drive/My Drive/Thesis HGAT/Code/test code/HGAT_author/word2vec_gensim_5"
+# model = gensim.models.Word2Vec.load(rootpath+'data/word2vec/word2vec_gensim_5')
+model = gensim.models.Word2Vec.load(w2v_path)
 print("word2vec model done.")
 
 # topK + 阈值
