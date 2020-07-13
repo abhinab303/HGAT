@@ -99,6 +99,8 @@ def build_text_feature(datapath, DATASETS, rho=0.3, lp=0.5, stopwords=list()):
                 continue
             
             entityList = json.loads(entityList)
+            if entityList is None:
+                entityList = []
             for d in entityList:
                 if d['rho'] < rho:
                     continue
