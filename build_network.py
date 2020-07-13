@@ -12,7 +12,7 @@ from utils import sample
 DATASETS = 'agnews'
 
 
-NumOfTrainTextPerClass = 2
+NumOfTrainTextPerClass = 300
 TOPK = 10
 SIM_MIN = 0.5
 
