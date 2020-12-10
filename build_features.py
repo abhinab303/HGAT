@@ -12,7 +12,7 @@ import os
 from utils import sample, preprocess_corpus_notDropEntity, load_stopwords
 
 import jieba
-DATASETS = 'example'
+DATASETS = 'agnews'
 
 
 
@@ -33,7 +33,7 @@ def build_entity_feature_with_description(datapath, stopwords=list()):
     cnt = 0
     for i in tqdm(range(40), desc="Read desc: "):
         filename = str(i).zfill(4)
-        with open("./data/wikiAbstract/"+filename, 'r') as f:
+        with open("./data/wikiAbstract/"+filename, 'r', encoding="utf8") as f:
             for line in f:
                 ent, desc = line.strip('\n').split('\t')
                 entity = ent.replace(" ", "_")
@@ -97,6 +97,8 @@ def build_text_feature(datapath, DATASETS, rho=0.3, lp=0.5, stopwords=list()):
                 continue
             
             entityList = json.loads(entityList)
+            if entityList is None:
+                entityList = []
             for d in entityList:
                 if d['rho'] < rho:
                     continue
@@ -108,6 +110,7 @@ def build_text_feature(datapath, DATASETS, rho=0.3, lp=0.5, stopwords=list()):
                 ent = d['title'].replace(" ", '')
                 involved_entity.add(ent)
                 ori = d['spot'].lower()
+                corpus[int(index2ind[int(ind)])] = corpus[int(index2ind[int(ind)])].replace(ori, ent)
                 content.replace(ori, ent)
 
             

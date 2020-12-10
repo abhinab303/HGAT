@@ -12,9 +12,7 @@ from scipy import sparse as spr
 
 from utils import sample
 
-DATASETS = 'example'
-
-
+DATASETS = 'agnews'
 
 rootpath = './'
 outpath = rootpath + 'model/data/{}/'.format(DATASETS)
@@ -35,24 +33,25 @@ def cnt_nodes(g):
         else:
             entity_nodes.add(i)
     print("# text_nodes: {}     # entity_nodes: {}     # topic_nodes: {}".format(
-            len(text_nodes), len(entity_nodes), len(topic_nodes)))
+        len(text_nodes), len(entity_nodes), len(topic_nodes)))
     return text_nodes, entity_nodes, topic_nodes
 
-with open(datapath+'model_network_sampled.pkl', 'rb') as f:
+
+with open(datapath + 'model_network_sampled.pkl', 'rb') as f:
     g = pickle.load(f)
 text_nodes, entity_nodes, topic_nodes = cnt_nodes(g)
 
-with open(datapath+"features_BOW.pkl", 'rb') as f:
+with open(datapath + "features_BOW.pkl", 'rb') as f:
     features_BOW = pickle.load(f)
-with open(datapath+"features_TFIDF.pkl", 'rb') as f:
+with open(datapath + "features_TFIDF.pkl", 'rb') as f:
     features_TFIDF = pickle.load(f)
-with open(datapath+"features_index.pkl", 'rb') as f:
+with open(datapath + "features_index.pkl", 'rb') as f:
     features_index_BOWTFIDF = pickle.load(f)
-with open(datapath+"features_entity_descBOW.pkl", 'rb') as f:
+with open(datapath + "features_entity_descBOW.pkl", 'rb') as f:
     features_entity_BOW = pickle.load(f)
-with open(datapath+"features_entity_descTFIDF.pkl", 'rb') as f:
+with open(datapath + "features_entity_descTFIDF.pkl", 'rb') as f:
     features_entity_TFIDF = pickle.load(f)
-with open(datapath+"features_entity_index_desc.pkl", 'rb') as f:
+with open(datapath + "features_entity_index_desc.pkl", 'rb') as f:
     features_entity_index_desc = pickle.load(f)
 
 feature = features_TFIDF
@@ -61,7 +60,7 @@ entityF = features_entity_TFIDF
 features_entity_index = features_entity_index_desc
 textShape = feature.shape
 entityShape = entityF.shape
-print("Shape of text feature:",textShape, 'Shape of entity feature:', entityShape)
+print("Shape of text feature:", textShape, 'Shape of entity feature:', entityShape)
 
 # 删掉没有特征的实体
 notinind = set()
@@ -80,8 +79,6 @@ N = len(g.nodes())
 print(len(g.nodes()), len(g.edges()))
 text_nodes, entity_nodes, topic_nodes = cnt_nodes(g)
 
-
-
 # 删掉一些边
 cnt = 0
 nodes = g.nodes()
@@ -89,13 +86,13 @@ print(len(g.edges()))
 for node in tqdm(nodes):
     try:
         cache = [j for j in g[node]
-                   if ('sim' in g[node][j] and g[node][j]['sim'] < SIM)    # 0.5
-                       or ('link_probability' in g[node][j] and g[node][j]['link_probability'] <= LP)
-                       or ('rho' in g[node][j] and g[node][j]['rho'] < RHO)
-                ]
+                 if ('sim' in g[node][j] and g[node][j]['sim'] < SIM)  # 0.5
+                 or ('link_probability' in g[node][j] and g[node][j]['link_probability'] <= LP)
+                 or ('rho' in g[node][j] and g[node][j]['rho'] < RHO)
+                 ]
         if len(cache) != 0:
-            g.remove_edges_from( [(node, i) for i in cache] )
-        cnt += len( cache )
+            g.remove_edges_from([(node, i) for i in cache])
+        cnt += len(cache)
     except:
         print(g[node])
         break
@@ -106,13 +103,7 @@ delete = [n for n in g.nodes() if len(g[n]) == 0 and n not in text_nodes]
 print("Num of 孤立点：", len(delete))
 g.remove_nodes_from(delete)
 
-
-
 train, vali, test, alltext = sample(datapath, DATASETS)
-
-
-
-
 
 # topic
 with open(datapath + 'topic_word_distribution.pkl', 'rb') as f:
@@ -128,6 +119,7 @@ for i in range(topic_num):
     topicName = 'topic_' + str(i)
     topics.append(topicName)
 
+
 def naive_arg_topK(matrix, K, axis=0):
     """
     perform topK based on np.argsort
@@ -139,6 +131,7 @@ def naive_arg_topK(matrix, K, axis=0):
     full_sort = np.argsort(-matrix, axis=axis)
     return full_sort.take(np.arange(K), axis=axis)
 
+
 topK_topics = naive_arg_topK(doc_topic, TopK_for_Topics, axis=1)
 for i in range(topK_topics.shape[0]):
     for j in range(TopK_for_Topics):
@@ -146,29 +139,28 @@ for i in range(topK_topics.shape[0]):
 
 print("gnodes:", len(g.nodes()), "gedges:", len(g.edges()))
 
-
-
-
-
 # build Edges data
 import collections
+
 cnt = 0
 nodes = g.nodes()
 graphdict = collections.defaultdict(list)
 for node in tqdm(nodes):
     try:
         cache = [j for j in g[node]
-                   if ('sim' in g[node][j] and g[node][j]['sim'] >= SIM) or ('sim' not in g[node][j])    # 0.5
-                   if ('link_probability' in g[node][j] and g[node][j]['link_probability'] > LP) or ('link_probability' not in g[node][j])
-                   if ('rho' in g[node][j] and g[node][j]['rho'] > RHO) or ('rho' not in g[node][j])
-                ]
+                 if ('sim' in g[node][j] and g[node][j]['sim'] >= SIM) or ('sim' not in g[node][j])  # 0.5
+                 if ('link_probability' in g[node][j] and g[node][j]['link_probability'] > LP) or (
+                             'link_probability' not in g[node][j])
+                 if ('rho' in g[node][j] and g[node][j]['rho'] > RHO) or ('rho' not in g[node][j])
+                 ]
         if len(cache) != 0:
-            graphdict[ node ] = cache
-        cnt += len( cache )
+            graphdict[node] = cache
+        cnt += len(cache)
     except:
         print(g[node])
         break
 print('edges: ', cnt)
+
 
 def normalizeF(mx):
     sup = np.absolute(mx).max()
@@ -176,18 +168,18 @@ def normalizeF(mx):
         return mx
     return mx / sup
 
+
 text_nodes, entity_nodes, topic_nodes = cnt_nodes(g)
 
 mapindex = dict()
 cnt = 0
-for i in text_nodes|entity_nodes|topic_nodes:
+for i in text_nodes | entity_nodes | topic_nodes:
     mapindex[i] = cnt
     cnt += 1
 print(len(g.nodes()), len(mapindex))
 
 if not os.path.exists(outpath):
     os.makedirs(outpath)
-
 
 # build feature data
 gnodes = set(g.nodes())
@@ -205,7 +197,7 @@ input_type = 'text&entity&topic2hgcn'
 if input_type == 'text&entity&topic2hgcn':
     node_with_feature = set()
     DEBUG = False
-    
+
     # text node
     content = dict()
     for i in tqdm(range(textShape[0])):
@@ -274,28 +266,24 @@ if input_type == 'text&entity&topic2hgcn':
     print(cache, len(mapindex))
     print("nodes with features:", len(node_with_feature))
 
-
-
 # save mappings
-with open(outpath+'mapindex.txt', 'w') as f:
+with open(outpath + 'mapindex.txt', 'w') as f:
     for i in mapindex:
-        f.write("{}\t{}\n".format(i, mapindex[i]))
-
-
+        f.write("{}\t{}\n".format(i.encode("utf-8"), mapindex[i]))
 
 # save adj matrix
-with open(outpath+'{}.cites'.format(DATASETS), 'w') as f:
+with open(outpath + '{}.cites'.format(DATASETS), 'w') as f:
     doneSet = set()
     nodeSet = set()
     for node in graphdict:
         for i in graphdict[node]:
             if (node, i) not in doneSet:
-                f.write( str(mapindex[node])+'\t'+str(mapindex[i])+'\n' )
-                doneSet.add( (i, node) )
-                doneSet.add( (node, i) )
-                nodeSet.add( node )
-                nodeSet.add( i )
+                f.write(str(mapindex[node]) + '\t' + str(mapindex[i]) + '\n')
+                doneSet.add((i, node))
+                doneSet.add((node, i))
+                nodeSet.add(node)
+                nodeSet.add(i)
     for i in tqdm(range(len(mapindex))):
-         f.write(str(i)+'\t'+str(i)+'\n')
+        f.write(str(i) + '\t' + str(i) + '\n')
 
 print('Num of nodes with edges: ', len(nodeSet))

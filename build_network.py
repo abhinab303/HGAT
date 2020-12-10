@@ -9,9 +9,9 @@ from tqdm import tqdm
 
 from utils import sample
 
-DATASETS = 'example'
+DATASETS = 'agnews'
 
-NumOfTrainTextPerClass = 2
+NumOfTrainTextPerClass = 400
 TOPK = 10
 SIM_MIN = 0.5
 
@@ -32,6 +32,8 @@ with open(datapath+'{}2entity.txt'.format(DATASETS), 'r') as f:
         if ind not in alltext:
             continue
         entityList = json.loads(entityList)
+        if entityList is None:
+            entityList = []
         entities = [(d['title'].replace(" ", '_'), d['rho'], d['link_probability'])
                         for d in entityList if 'title' in d and float(d['rho']) > rho]
         entitySet.update([d['title'].replace(" ", '_')

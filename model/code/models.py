@@ -53,7 +53,7 @@ class HGAT(nn.Module):
 
     def forward(self, x_list, adj_list, adj_all = None):
         x0 = x_list
-        
+        print("Forward Start....")
         if not self.node_attention:
             x1 = [None for _ in range(self.ntype)]
             # First Layer

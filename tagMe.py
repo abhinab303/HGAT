@@ -7,7 +7,7 @@ from tqdm import tqdm
 from multiprocessing import Pool as ProcessPool
 time0 = time.time()
 
-dataset = 'example'
+dataset = 'agnews'
 
 
 def getEntityList(text):
